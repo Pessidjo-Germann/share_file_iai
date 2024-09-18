@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:share_file_iai/constante.dart';
@@ -5,18 +6,65 @@ import 'package:share_file_iai/screen/connexion/connexion_screnn.dart';
 import 'package:share_file_iai/screen/inscription/components/confirm_password.dart';
 import 'package:share_file_iai/screen/inscription/components/psd_input.dart';
 import 'package:share_file_iai/widget/bouton_continuer_2.dart';
+import 'package:share_file_iai/widget/toast_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'email_input.dart';
 
-class Body extends StatelessWidget {
+class Body extends StatefulWidget {
   const Body({super.key});
 
   @override
+  State<Body> createState() => _BodyState();
+}
+
+class _BodyState extends State<Body> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController psdController = TextEditingController();
+  final TextEditingController newPsdController = TextEditingController();
+
+  final globalKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+
+  Future<void> _createAccount() async {
+    setState(() {
+      _isLoading = true; // Démarrer l'animation de chargement
+    });
+
+    try {
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
+        email: emailController.text,
+        password: psdController.text,
+      );
+      // Compte créé avec succès
+      // Une fois connecté, on met isConnect à true
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isConnect', true);
+
+      // Redirection vers l'écran principal
+      Navigator.pushReplacementNamed(context, '/home');
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        print('Le mot de passe est trop faible.');
+      } else if (e.code == 'email-already-in-use') {
+        print('Un compte existe déjà pour cet email.');
+      }
+    } catch (e) {
+      print(e.toString());
+      print(e);
+    } finally {
+      setState(() {
+        _isLoading = false; // Arrêter l'animation de chargement
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController psdController = TextEditingController();
-    final TextEditingController newPsdController = TextEditingController();
     final size = MediaQuery.of(context).size;
+
     return SingleChildScrollView(
       child: SafeArea(
         child: Padding(
@@ -46,32 +94,44 @@ class Body extends StatelessWidget {
                   ),
                   const SizedBox(height: 60),
                   Form(
+                      key: globalKey,
                       child: Column(
-                    children: [
-                      EmailInput(
-                        label: "Entrer votre email",
-                        controller: emailController,
-                      ),
-                      const SizedBox(height: 20),
-                      PassWordInput(
-                        label: 'Entrer votre mot de passe',
-                        controller: psdController,
-                      ),
-                      const SizedBox(height: 20),
-                      ConfirmInput(
-                        controller: newPsdController,
-                        label: 'Confirmer votre mot de passe',
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                  )),
+                        children: [
+                          EmailInput(
+                            label: "Entrer votre email",
+                            controller: emailController,
+                          ),
+                          const SizedBox(height: 20),
+                          PassWordInput(
+                            label: 'Entrer votre mot de passe',
+                            controller: psdController,
+                          ),
+                          const SizedBox(height: 20),
+                          ConfirmInput(
+                            controller: newPsdController,
+                            label: 'Confirmer votre mot de passe',
+                          ),
+                          const SizedBox(height: 10),
+                        ],
+                      )),
                   const Row(
                     children: [
                       Spacer(),
                     ],
                   ),
                   const SizedBox(height: 100),
-                  BottonContinuer2(size: size),
+                  _isLoading
+                      ? const CircularProgressIndicator()
+                      : BottonContinuer2(
+                          size: size,
+                          press: () {
+                            if (globalKey.currentState!.validate()) {
+                              if (psdController == newPsdController) {
+                                _createAccount();
+                              }
+                            }
+                          },
+                        ),
                   const SizedBox(height: 18),
                   RowAction(
                     label: "Déjà un compte ?",

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:share_file_iai/screen/connexion/connexion_screnn.dart';
 import 'package:share_file_iai/screen/inscription/components/email_input.dart';
@@ -6,13 +7,49 @@ import 'package:share_file_iai/widget/bouton_continuer_2.dart';
 import '../../inscription/InscriptionScreen.dart';
 import '../../inscription/components/body.dart';
 
-class Body extends StatelessWidget {
+class Body extends StatefulWidget {
   const Body({super.key});
 
   @override
+  State<Body> createState() => _BodyState();
+}
+
+class _BodyState extends State<Body> {
+  bool _isLoading = false;
+  final TextEditingController emailController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  @override
   Widget build(BuildContext context) {
-    final TextEditingController emailController = TextEditingController();
     final Size size = MediaQuery.of(context).size;
+
+    Future<void> _sendPasswordResetEmail() async {
+      setState(() {
+        _isLoading = true; // Activer l'animation de chargement
+      });
+
+      try {
+        await _auth.sendPasswordResetEmail(email: emailController.text);
+        // Afficher un message de succès
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lien de réinitialisation envoyé.')),
+        );
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'user-not-found') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Aucun utilisateur trouvé pour cet email.")),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Erreur lors de la réinitialisation.")),
+          );
+        }
+      } finally {
+        setState(() {
+          _isLoading = false; // Désactiver l'animation de chargement
+        });
+      }
+    }
+
     return Padding(
       padding: const EdgeInsets.only(left: 28, right: 28),
       child: SafeArea(
@@ -61,7 +98,13 @@ class Body extends StatelessWidget {
               controller: emailController,
             ),
             const SizedBox(height: 60),
-            BottonContinuer2(size: size),
+            _isLoading?CircularProgressIndicator():
+            BottonContinuer2(
+              size: size,
+              press: () {
+                _sendPasswordResetEmail();
+              },
+            ),
             const SizedBox(height: 20),
             RowAction(
               label: "Pas encore de compte ?",

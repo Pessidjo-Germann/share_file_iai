@@ -3,17 +3,15 @@ import 'package:flutter/material.dart';
 class BottonContinuer2 extends StatelessWidget {
   const BottonContinuer2({
     super.key,
-    required this.size,
+    required this.size, required this.press,
   });
 
   final Size size;
-
+  final Function() press;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, '');
-      },
+      onTap: press,
       child: SizedBox(
         child: Container(
             width: size.width,

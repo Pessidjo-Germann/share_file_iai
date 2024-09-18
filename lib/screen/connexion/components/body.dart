@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:share_file_iai/screen/inscription/InscriptionScreen.dart';
 import 'package:share_file_iai/screen/inscription/components/email_input.dart';
 import 'package:share_file_iai/screen/inscription/components/psd_input.dart';
 import 'package:share_file_iai/widget/bouton_continuer_2.dart';
@@ -36,13 +37,12 @@ class _BodyState extends State<Body> {
           password: psdController.text,
         );
         // Connexion réussie
-           // Une fois connecté, on met isConnect à true
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isConnect', true);
-
-
-      // Redirection vers l'écran principal
-      Navigator.pushReplacementNamed(context, '/home');
+        // Une fois connecté, on met isConnect à true
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isConnect', true);
+        ToastService.successMessage('Connexion reussite', Colors.blue, context);
+        // Redirection vers l'écran principal
+        Navigator.pushReplacementNamed(context, '/home');
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
           ToastService.errorMessage(
@@ -64,11 +64,6 @@ class _BodyState extends State<Body> {
             padding: const EdgeInsets.only(left: 28, right: 28),
             child: Column(
               children: [
-                const Text(
-                  "Connexion",
-                  textScaleFactor: 1.8,
-                  style: TextStyle(),
-                ),
                 const SizedBox(height: 90),
                 const Text(
                   "Welcome Back",
@@ -115,21 +110,27 @@ class _BodyState extends State<Body> {
                         ],
                       ),
                       const SizedBox(height: 100),
-                      _isLoading?CircularProgressIndicator():
-                      BottonContinuer2(
-                        size: size,
-                        press: () {
-                          if (formKey.currentState!.validate()) {
-                            _signIn();
-                          }
-                        },
-                      ),
+                      _isLoading
+                          ? CircularProgressIndicator()
+                          : BottonContinuer2(
+                              size: size,
+                              press: () {
+                                if (formKey.currentState!.validate()) {
+                                  _signIn();
+                                }
+                              },
+                              name: 'Connectez-vous',
+                            ),
                       const SizedBox(height: 18),
                       RowAction(
                         label: "Pas encore de compte ?",
                         label2: "Creez-en-un",
                         press: () {
-                          Navigator.pushNamed(context, 'routeName');
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const InscriptionScreen()));
                         },
                       ),
                     ],

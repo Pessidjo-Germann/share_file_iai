@@ -8,7 +8,7 @@ const kcolorQuiz = Color(0xFFF5EAC8);
 const kcolorConcour = Color(0xFF92E3A9);
 const kbackGroungColor = Color.fromARGB(36, 163, 208, 228);
 const kboxLevel = Color(0xFFE3C2E9);
-
+const kColorBlack = Colors.black;
 const toastDuration = Duration(seconds: 6);
 const kyellowColor = Color.fromRGBO(255, 192, 0, 1);
 Widget textPresentation({

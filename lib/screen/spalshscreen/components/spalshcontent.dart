@@ -16,7 +16,10 @@ class SpalshContent extends StatelessWidget {
         children: [
           //const SizedBox(height: 70),
           const Spacer(flex: 2),
-          Center(child: Image.asset(img)),
+          Center(
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.asset(img, width: 200, height: 200))),
           const SizedBox(height: 70),
           const Text(
             "APP SCHOOL",

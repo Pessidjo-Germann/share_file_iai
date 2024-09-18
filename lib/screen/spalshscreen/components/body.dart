@@ -15,19 +15,20 @@ class _BodyState extends State<Body> {
   int currentIndex = 0;
   List<Map<String, String>> splashData = [
     {
+      "img": "assets/images/9894285.jpg",
+      "text":
+          """Bienvenue dans votre application de partage"""
+    },
+    {
       "img": "assets/images/folder.png",
-      "text": "Bienvenue votre application!"
+      "text": "Partagez vos dossiers en toute sécurité!"
     },
     {
       "img": "assets/images/file_document.png",
       "text":
-          """Venez remplacer """
+          """Vos documents seront sauvegardés! """
     },
-    {
-      "img": "asset/img/spalsh4.png",
-      "text":
-          """Profitez aussi de votre IA pour causer et disputer avec tranquilité"""
-    },
+   
   ];
 
   @override

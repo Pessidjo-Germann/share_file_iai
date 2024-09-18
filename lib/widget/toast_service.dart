@@ -15,7 +15,7 @@ class ToastService {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Image.asset('img/Group 140.png'),
+            Image.asset('assets/images/Group 140.png'),
             Flexible(
               child: Column(
                 children: [
@@ -64,7 +64,7 @@ class ToastService {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Image.asset("img/Group 140.png"),
+          Image.asset("assets/images/Group 140.png"),
           const SizedBox(width: 10),
           Flexible(
             child: SizedBox(
@@ -105,7 +105,7 @@ class ToastService {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Image.asset("img/Group 139.png"),
+          Image.asset("assets/images/Group 139.png"),
           const SizedBox(width: 10),
           Flexible(
             child: textPresentation(
@@ -134,7 +134,7 @@ class ToastService {
         ),
         child: Row(
           children: [
-            Image.asset("img/Group 139.png"),
+            Image.asset("assets/images/Group 139.png"),
             Flexible(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

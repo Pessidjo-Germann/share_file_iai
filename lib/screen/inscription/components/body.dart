@@ -27,42 +27,45 @@ class _BodyState extends State<Body> {
   final globalKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
-  Future<void> _createAccount() async {
-    setState(() {
-      _isLoading = true; // Démarrer l'animation de chargement
-    });
-
-    try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: emailController.text,
-        password: psdController.text,
-      );
-      // Compte créé avec succès
-      // Une fois connecté, on met isConnect à true
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isConnect', true);
-
-      // Redirection vers l'écran principal
-      Navigator.pushReplacementNamed(context, '/home');
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        print('Le mot de passe est trop faible.');
-      } else if (e.code == 'email-already-in-use') {
-        print('Un compte existe déjà pour cet email.');
-      }
-    } catch (e) {
-      print(e.toString());
-      print(e);
-    } finally {
-      setState(() {
-        _isLoading = false; // Arrêter l'animation de chargement
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    Future<void> _createAccount() async {
+      setState(() {
+        _isLoading = true; // Démarrer l'animation de chargement
+      });
+
+      try {
+        UserCredential userCredential =
+            await _auth.createUserWithEmailAndPassword(
+          email: emailController.text,
+          password: psdController.text,
+        );
+        // Compte créé avec succès
+        // Une fois connecté, on met isConnect à true
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isConnect', true);
+        ToastService.successMessage('Inscription réussite', Colors.blue, context);
+        // Redirection vers l'écran principal
+        Navigator.pushReplacementNamed(context, '/home');
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          ToastService.errorMessage(
+              'Le mot de passe est trop faible.', context);
+        } else if (e.code == 'email-already-in-use') {
+          //  print('Un compte existe déjà pour cet email.');
+          ToastService.errorMessage(
+              'Un compte existe déjà pour cet email.', context);
+        }
+      } catch (e) {
+        print(e.toString());
+        print(e);
+      } finally {
+        setState(() {
+          _isLoading = false; // Arrêter l'animation de chargement
+        });
+      }
+    }
+
     final size = MediaQuery.of(context).size;
 
     return SingleChildScrollView(
@@ -71,13 +74,9 @@ class _BodyState extends State<Body> {
           padding: const EdgeInsets.only(left: 28, right: 28),
           child: Center(
             child: Form(
+              key: globalKey,
               child: Column(
                 children: [
-                  const Text(
-                    "Inscription",
-                    textScaleFactor: 1.8,
-                    style: TextStyle(),
-                  ),
                   const SizedBox(height: 90),
                   const Text(
                     "Register Account",
@@ -94,26 +93,26 @@ class _BodyState extends State<Body> {
                   ),
                   const SizedBox(height: 60),
                   Form(
-                      key: globalKey,
+                      //key: globalKey,
                       child: Column(
-                        children: [
-                          EmailInput(
-                            label: "Entrer votre email",
-                            controller: emailController,
-                          ),
-                          const SizedBox(height: 20),
-                          PassWordInput(
-                            label: 'Entrer votre mot de passe',
-                            controller: psdController,
-                          ),
-                          const SizedBox(height: 20),
-                          ConfirmInput(
-                            controller: newPsdController,
-                            label: 'Confirmer votre mot de passe',
-                          ),
-                          const SizedBox(height: 10),
-                        ],
-                      )),
+                    children: [
+                      EmailInput(
+                        label: "Entrer votre email",
+                        controller: emailController,
+                      ),
+                      const SizedBox(height: 20),
+                      PassWordInput(
+                        label: 'Entrer votre mot de passe',
+                        controller: psdController,
+                      ),
+                      const SizedBox(height: 20),
+                      ConfirmInput(
+                        controller: newPsdController,
+                        label: 'Confirmer votre mot de passe',
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  )),
                   const Row(
                     children: [
                       Spacer(),
@@ -126,18 +125,22 @@ class _BodyState extends State<Body> {
                           size: size,
                           press: () {
                             if (globalKey.currentState!.validate()) {
-                              if (psdController == newPsdController) {
+                              if (psdController.text == newPsdController.text) {
                                 _createAccount();
                               }
                             }
                           },
+                          name: 'S\'inscrire',
                         ),
                   const SizedBox(height: 18),
                   RowAction(
                     label: "Déjà un compte ?",
                     label2: "Connectez-vous ",
                     press: () {
-                      Navigator.pushNamed(context, ConnexionScreen.routeName);
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ConnexionScreen()));
                     },
                   ),
                 ],
@@ -176,7 +179,7 @@ class RowAction extends StatelessWidget {
           child: Text(
             label2,
             style: const TextStyle(
-              fontSize: 20,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: kprimaryColor,
             ),

@@ -103,7 +103,7 @@ class _BodyState extends State<Body> {
               size: size,
               press: () {
                 _sendPasswordResetEmail();
-              },
+              }, name: 'Recevoir',
             ),
             const SizedBox(height: 20),
             RowAction(

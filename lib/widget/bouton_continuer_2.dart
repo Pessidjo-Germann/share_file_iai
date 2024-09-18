@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 class BottonContinuer2 extends StatelessWidget {
   const BottonContinuer2({
     super.key,
-    required this.size, required this.press,
+    required this.size,
+    required this.press, required this.name,
   });
-
+  final String name;
   final Size size;
   final Function() press;
   @override
@@ -20,10 +21,10 @@ class BottonContinuer2 extends StatelessWidget {
               color: const Color(0xff3737a0),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Center(
+            child:  Center(
               child: Text(
-                "Continuer",
-                style: TextStyle(
+                name,
+                style:const TextStyle(
                   color: Colors.white,
                   fontSize: 23,
                   fontWeight: FontWeight.w600,

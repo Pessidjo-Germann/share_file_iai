@@ -42,6 +42,9 @@ dependencies:
   fluttertoast: ^8.2.8
   auto_size_text: ^3.0.0
   shared_preferences: ^2.3.2
+  svg_flutter: ^0.0.1
+  salomon_bottom_bar: ^3.3.2
+  cloud_firestore: ^5.4.2
 
 dev_dependencies:
   flutter_test:

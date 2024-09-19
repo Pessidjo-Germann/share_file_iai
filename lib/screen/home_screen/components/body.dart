@@ -1,119 +1,108 @@
 import 'package:flutter/material.dart';
 import 'package:share_file_iai/constante.dart';
+import 'package:share_file_iai/screen/home_screen/components/create_folder.dart';
+import 'package:svg_flutter/svg.dart';
 
-class Body extends StatelessWidget {
+import 'box_document.dart';
+import 'container_widget.dart';
+
+class Body extends StatefulWidget {
   const Body({super.key});
 
   @override
+  State<Body> createState() => _BodyState();
+}
+
+class _BodyState extends State<Body> {
+  @override
   Widget build(BuildContext context) {
+    int pageIndex = 0;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.only(left: 20, right: 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 80),
-            textPresentation(
-                maxLine: 2,
-                textAlign: TextAlign.start,
-                msg: 'Bienvenue dans votre \nEspace de travail.',
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-                size: 25),
-            const SizedBox(height: 10),
-            textPresentation(
-                msg: 'Créer un nouvel elément',
-                color: Colors.black,
-                fontWeight: FontWeight.normal,
-                textAlign: TextAlign.start,
-                size: 17),
-            const SizedBox(height: 30),
-            Row(
-              children: [
-                Expanded(
-                    child: BoxDocument(
-                  file: 'assets/images/file.png',
-                  message2: 'file',
-                  message: 'Fichier',
-                )),
-                Expanded(
-                    child: const BoxDocument(
-                  file: 'assets/images/folder.png',
-                  message2: 'document',
-                  message: 'Documents',
-                )),
-              ],
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 80),
+              textPresentation(
+                  maxLine: 2,
+                  textAlign: TextAlign.start,
+                  msg: 'Bienvenue dans votre \nEspace de travail.',
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black,
+                  size: 25),
+              const SizedBox(height: 10),
+              textPresentation(
+                  msg: 'Créer un nouvel elément',
+                  color: Colors.black,
+                  fontWeight: FontWeight.normal,
+                  textAlign: TextAlign.start,
+                  size: 17),
+              const SizedBox(height: 30),
+              Row(
+                children: [
+                  Expanded(
+                      child: BoxDocument(
+                    file: 'assets/images/file.png',
+                    message2: 'file',
+                    message: 'Fichier',
+                    press: () {},
+                  )),
+                  Expanded(
+                      child: BoxDocument(
+                    file: 'assets/images/folder.png',
+                    message2: 'document',
+                    message: 'Documents',
+                    press: () {
+                      _showCreateFolderModal(context);
+                    },
+                  )),
+                ],
+              ),
+              const SizedBox(height: 20),
+              textPresentation(
+                  msg: 'Accès rapide',
+                  fontWeight: FontWeight.bold,
+                  size: 16,
+                  color: kColorBlack),
+              MyContainerWidget(),
+              const SizedBox(height: 30),
+              Container(
+                width: double.infinity,
+
+                color: Colors.white70, // Couleur par défaut
+                child: Column(
+                  children: [
+                    SvgPicture.asset('assets/icons/people_light_msa.svg'),
+                    const SizedBox(height: 30),
+                    textPresentation(
+                        msg: 'Aucun element partage',
+                        fontWeight: FontWeight.bold,
+                        size: 16,
+                        color: kColorBlack),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-}
 
-class BoxDocument extends StatefulWidget {
-  const BoxDocument(
-      {super.key,
-      required this.message,
-      required this.message2,
-      required this.file});
-  final String message, message2, file;
-
-  @override
-  _BoxDocumentState createState() => _BoxDocumentState();
-}
-
-class _BoxDocumentState extends State<BoxDocument> {
-  Color containerColor = Colors.white70; // Couleur par défaut
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) {
-        setState(() {
-          containerColor =
-              const Color.fromARGB(255, 251, 201, 187); // Couleur au survol
-        });
+  void _showCreateFolderModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled:
+          true, // Pour permettre à la modal de prendre plus d'espace
+      builder: (BuildContext context) {
+        return Padding(
+          padding: MediaQuery.of(context).viewInsets, // Gérer le clavier
+          child: CreateFolderForm(),
+        );
       },
-      onExit: (_) {
-        setState(() {
-          containerColor = Colors.white70; // Revenir à la couleur par défaut
-        });
-      },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            margin: const EdgeInsets.all(6),
-            height: 200,
-            color: containerColor, // Couleur dynamique
-            child: Image.asset(widget.file, width: 150, height: 150),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                textPresentation(
-                    msg: widget.message,
-                    fontWeight: FontWeight.bold,
-                    size: 15,
-                    color: kColorBlack,
-                    textAlign: TextAlign.start),
-                textPresentation(
-                    msg: widget.message2,
-                    fontWeight: FontWeight.w200,
-                    size: 13,
-                    color: kColorBlack,
-                    textAlign: TextAlign.start),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

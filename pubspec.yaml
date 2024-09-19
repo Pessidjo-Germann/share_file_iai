@@ -45,6 +45,11 @@ dependencies:
   svg_flutter: ^0.0.1
   salomon_bottom_bar: ^3.3.2
   cloud_firestore: ^5.4.2
+  dio: ^5.7.0
+  path_provider: ^2.1.4
+  image_picker: ^1.1.2
+  firebase_storage: ^12.3.1
+  path: ^1.9.0
 
 dev_dependencies:
   flutter_test:

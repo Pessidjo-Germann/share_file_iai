@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:share_file_iai/screen/liste_fichier/list_file.dart';
 import 'package:share_file_iai/widget/bouton_continuer_2.dart';
 
 class FolderListPage extends StatelessWidget {
@@ -77,6 +78,14 @@ class FolderListPage extends StatelessWidget {
                 subtitle: Text('Catégorie: ${folder['category']}'),
                 onTap: () {
                   // Action lors de la sélection du dossier (par exemple, afficher les fichiers)
+                  print('hello');
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FileListPage(
+                                name: folder['name'],
+                                id: folders[index].id,
+                              )));
                 },
               );
             },

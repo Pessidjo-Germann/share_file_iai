@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ConfirmInput extends StatelessWidget {
-  const ConfirmInput({
+  const  ConfirmInput({
     super.key,
     required this.label,
     required this.controller,

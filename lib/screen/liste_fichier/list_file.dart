@@ -4,9 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:share_file_iai/constante.dart';
 
 class FileListPage extends StatefulWidget {
@@ -18,6 +20,7 @@ class FileListPage extends StatefulWidget {
 }
 
 class _FileListPageState extends State<FileListPage> {
+  double? progress;
   @override
   Widget build(BuildContext context) {
     File? _file;
@@ -113,7 +116,7 @@ class _FileListPageState extends State<FileListPage> {
                           // Vérification des champs
                           final fileName = file['name'] ?? 'Nom indisponible';
                           final uploadedAt = file['uploadedAt'] != null
-                              ? 'uploadedAt' //.toDate()
+                              ? file['uploadedAt'].toDate()
                               : 'Date indisponible';
 
                           return ListTile(
@@ -122,7 +125,9 @@ class _FileListPageState extends State<FileListPage> {
                             title: Text(fileName),
                             subtitle: Text('Téléchargé le $uploadedAt'),
                             trailing: IconButton(
-                              icon: Icon(Icons.download, color: Colors.green),
+                              icon: progress != null
+                                  ? CircularProgressIndicator()
+                                  : Icon(Icons.download, color: Colors.green),
                               onPressed: () {
                                 _downloadFile(
                                     file['url'], file['name'], context);
@@ -160,29 +165,45 @@ class _FileListPageState extends State<FileListPage> {
   Future<void> _downloadFile(
       String url, String fileName, BuildContext context) async {
     try {
-      // Obtenir le répertoire où enregistrer le fichier
-      final dir = await getApplicationDocumentsDirectory();
-      String savePath = '${dir.path}/$fileName';
+      // Demande la permission d'écrire dans le stockage
+      var status = await Permission.storage.request();
 
-      // Télécharger le fichier avec Dio
-      Dio dio = Dio();
+      if (status.isGranted) {
+        // Obtenir le répertoire Downloads
+        Directory downloadsDirectory =
+            Directory('/storage/emulated/0/Download');
 
-      await dio.download(
-        url,
-        savePath,
-        onReceiveProgress: (received, total) {
-          if (total != -1) {
-            // Afficher la progression du téléchargement
-            print('Progress: ${(received / total * 100).toStringAsFixed(0)}%');
-          }
-        },
-      );
+        if (await downloadsDirectory.exists()) {
+          String savePath = '${downloadsDirectory.path}/$fileName';
 
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Téléchargement terminé: $fileName')));
+          // Télécharger le fichier
+          Dio dio = Dio();
+          FileDownloader.downloadFile(
+              url: url,
+              onProgress: (fileName, progresse) {
+                // setState(() {
+                progress = progresse;
+                // });
+              },
+              onDownloadCompleted: (path) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Téléchargement terminé dans $path')));
+              });
 
-      // Ouvrir le fichier téléchargé ou faire autre chose
-      print('Fichier téléchargé dans: $savePath');
+          // Afficher un message de succès
+        } else {
+          print('Erreur: Impossible de trouver le répertoire Downloads');
+          throw Exception('Impossible d\'accéder au répertoire Downloads');
+        }
+      } else if (status.isDenied) {
+        // Si la permission est refusée
+        print('Permission refusée');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Permission refusée pour accéder au stockage')));
+      } else if (status.isPermanentlyDenied) {
+        // Si la permission est refusée de façon permanente, demander à l'utilisateur de l'activer manuellement
+        openAppSettings();
+      }
     } catch (e) {
       print('Erreur lors du téléchargement: $e');
       ScaffoldMessenger.of(context).showSnackBar(

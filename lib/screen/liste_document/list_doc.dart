@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:share_file_iai/constante.dart';
 import 'package:share_file_iai/screen/liste_fichier/list_file.dart';
 import 'package:share_file_iai/widget/bouton_continuer_2.dart';
 
@@ -10,7 +11,7 @@ class FolderListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     String initalValue = '';
     final TextEditingController _folderNameController = TextEditingController();
-
+    List<String> selectedUsers = [];
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mes Dossiers'),
@@ -52,6 +53,8 @@ class FolderListPage extends StatelessWidget {
                       //on supprime
                       _showDeleteFolder(
                           context, folders[index].id, folder['name']);
+                    } else if (value == 'share') {
+                      _showUser(context, selectedUsers);
                     }
                   },
                   itemBuilder: (BuildContext context) {
@@ -93,6 +96,49 @@ class FolderListPage extends StatelessWidget {
         },
       ),
     );
+  }
+
+  void _showUser(BuildContext context, List<String> selectedUsers) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance.collection('users').snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(child: Text('Erreur: ${snapshot.error}'));
+              }
+
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              }
+
+              final users = snapshot.data!.docs;
+
+              return ListView.builder(
+                itemCount: (users.length + 1),
+                itemBuilder: (context, index) {
+                  final user = users[index];
+                  final userId = user.id;
+                  final userName = user['name'];
+                  if (index > users.length) {
+                    return BottonContinuer2(
+                        size: MediaQuery.of(context).size,
+                        color: Colors.red,
+                        press: () {
+                          Navigator.pop(context);
+                        },
+                        name: 'Partager');
+                  }
+                  return CardUser(
+                      userName: userName,
+                      userId: userId,
+                      selectedUsers: selectedUsers);
+                },
+              );
+            },
+          );
+        });
   }
 
   void _showModifyFolderModal(BuildContext context,
@@ -148,6 +194,43 @@ class FolderListPage extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class CardUser extends StatefulWidget {
+  const CardUser({
+    super.key,
+    required this.userName,
+    required this.userId,
+    required this.selectedUsers,
+  });
+
+  final dynamic userName;
+  final String userId;
+  final List<String> selectedUsers;
+
+  @override
+  State<CardUser> createState() => _CardUserState();
+}
+
+class _CardUserState extends State<CardUser> {
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(widget.userName),
+      trailing: Checkbox(
+        value: widget.selectedUsers.contains(widget.userId),
+        onChanged: (bool? isSelected) {
+          setState(() {
+            if (isSelected == true) {
+              widget.selectedUsers.add(widget.userId);
+            } else {
+              widget.selectedUsers.remove(widget.userId);
+            }
+          });
+        },
+      ),
     );
   }
 }

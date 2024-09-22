@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -40,11 +41,18 @@ class _BodyState extends State<Body> {
           email: emailController.text,
           password: psdController.text,
         );
+        await FirebaseFirestore.instance.collection('users').add({
+          'name': newPsdController.text,
+          'id': userCredential.user!.uid,
+          'createdAt':
+              FieldValue.serverTimestamp(), // Timestamp pour trier les dossiers
+        });
         // Compte créé avec succès
         // Une fois connecté, on met isConnect à true
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isConnect', true);
-        ToastService.successMessage('Inscription réussite', Colors.blue, context);
+        ToastService.successMessage(
+            'Inscription réussite', Colors.blue, context);
         // Redirection vers l'écran principal
         Navigator.pushReplacementNamed(context, '/home');
       } on FirebaseAuthException catch (e) {
@@ -57,8 +65,7 @@ class _BodyState extends State<Body> {
               'Un compte existe déjà pour cet email.', context);
         }
       } catch (e) {
-        print(e.toString());
-        print(e);
+        ToastService.errorMessage(e.toString(), context);
       } finally {
         setState(() {
           _isLoading = false; // Arrêter l'animation de chargement
@@ -108,7 +115,7 @@ class _BodyState extends State<Body> {
                       const SizedBox(height: 20),
                       ConfirmInput(
                         controller: newPsdController,
-                        label: 'Confirmer votre mot de passe',
+                        label: 'Entrer votre nom',
                       ),
                       const SizedBox(height: 10),
                     ],
@@ -125,9 +132,9 @@ class _BodyState extends State<Body> {
                           size: size,
                           press: () {
                             if (globalKey.currentState!.validate()) {
-                              if (psdController.text == newPsdController.text) {
+                            
                                 _createAccount();
-                              }
+                              
                             }
                           },
                           name: 'S\'inscrire',

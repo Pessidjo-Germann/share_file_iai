@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:share_file_iai/screen/home_screen/home_screen.dart';
 import 'package:share_file_iai/screen/inscription/InscriptionScreen.dart';
+import 'package:share_file_iai/screen/spalshscreen/spalshScreen.dart';
 
 import 'route.dart';
 
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
             if (snapshot.hasData) {
               return const HomeScreen();
             } else {
-              return const InscriptionScreen();
+              return SpalshScreen();
             }
           }),
     );

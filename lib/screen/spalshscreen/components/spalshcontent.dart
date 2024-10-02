@@ -22,7 +22,7 @@ class SpalshContent extends StatelessWidget {
                   child: Image.asset(img, width: 200, height: 200))),
           const SizedBox(height: 70),
           const Text(
-            "APP SCHOOL",
+            "GEDAHAppIAI",
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 30,

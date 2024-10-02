@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
@@ -24,6 +25,7 @@ class _FileListPageState extends State<FileListPage> {
   @override
   Widget build(BuildContext context) {
     File? _file;
+      User? user = FirebaseAuth.instance.currentUser;
     final picker = ImagePicker();
     Future<void> uploadFile() async {
       if (_file == null) return;
@@ -49,6 +51,7 @@ class _FileListPageState extends State<FileListPage> {
             .add({
           'name': fileName,
           'url': fileUrl,
+           'createdBy': user!.uid,  // ID de l'utilisateur qui télécharge le fichier
           'uploadedAt': FieldValue.serverTimestamp(),
         });
 

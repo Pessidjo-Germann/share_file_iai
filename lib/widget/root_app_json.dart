@@ -15,7 +15,7 @@ const List rootAppJson = [
   },
   {
     "icon" : "assets/icons/folder_icon.svg",
-    "text" : "Files",
+    "text" : "Collaboration",
     "color" : Colors.pink
   },
   {

@@ -40,15 +40,18 @@ class _BodyState extends State<Body> {
         // Une fois connecté, on met isConnect à true
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isConnect', true);
-        ToastService.successMessage('Connexion reussite', Colors.blue, context);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Connexion reussite')));
+
         // Redirection vers l'écran principal
         Navigator.pushReplacementNamed(context, '/home');
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
-          ToastService.errorMessage(
-              'Aucun utilisateur trouvé pour cet email.', context);
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Aucun utilisateur trouvé pour cet email.')));
         } else if (e.code == 'wrong-password') {
-          ToastService.errorMessage('Mot de passe incorrect.', context);
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Mot de passe incorrect.')));
         }
       } finally {
         setState(() {
@@ -64,6 +67,8 @@ class _BodyState extends State<Body> {
             padding: const EdgeInsets.only(left: 28, right: 28),
             child: Column(
               children: [
+                const SizedBox(height: 10),
+                Image.asset("assets/images/icon_logo.jpg"),
                 const SizedBox(height: 90),
                 const Text(
                   "Welcome Back",

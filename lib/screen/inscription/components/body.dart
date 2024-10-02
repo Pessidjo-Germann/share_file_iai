@@ -51,18 +51,19 @@ class _BodyState extends State<Body> {
         // Une fois connecté, on met isConnect à true
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isConnect', true);
-        ToastService.successMessage(
-            'Inscription réussite', Colors.blue, context);
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Inscription réussite')));
+
         // Redirection vers l'écran principal
         Navigator.pushReplacementNamed(context, '/home');
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
-          ToastService.errorMessage(
-              'Le mot de passe est trop faible.', context);
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Le mot de passe est trop faible.')));
         } else if (e.code == 'email-already-in-use') {
           //  print('Un compte existe déjà pour cet email.');
-          ToastService.errorMessage(
-              'Un compte existe déjà pour cet email.', context);
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Un compte existe déjà pour cet email.')));
         }
       } catch (e) {
         ToastService.errorMessage(e.toString(), context);
@@ -84,6 +85,8 @@ class _BodyState extends State<Body> {
               key: globalKey,
               child: Column(
                 children: [
+                  const SizedBox(height: 10),
+                  Image.asset("assets/images/icon_logo.jpg"),
                   const SizedBox(height: 90),
                   const Text(
                     "Register Account",
@@ -132,9 +135,7 @@ class _BodyState extends State<Body> {
                           size: size,
                           press: () {
                             if (globalKey.currentState!.validate()) {
-                            
-                                _createAccount();
-                              
+                              _createAccount();
                             }
                           },
                           name: 'S\'inscrire',

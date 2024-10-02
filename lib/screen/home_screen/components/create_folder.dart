@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:share_file_iai/widget/bouton_continuer_2.dart';
 
@@ -13,9 +14,9 @@ class _CreateFolderFormState extends State<CreateFolderForm> {
   bool isLoading = false;
 
   final List<String> _categories = [
-    'Travail',
-    'Personnel',
-    'École',
+    'Scolarite',
+    'Service études',
+    'Comptabilité',
     'Autre'
   ]; // Liste des catégories
 
@@ -85,6 +86,7 @@ class _CreateFolderFormState extends State<CreateFolderForm> {
   }
 
   void _createFolder(BuildContext context) async {
+    User? user = FirebaseAuth.instance.currentUser;
     // Récupérer le nom du dossier et la catégorie
     String folderName = _folderNameController.text;
     String? category = _selectedCategory;
@@ -94,9 +96,10 @@ class _CreateFolderFormState extends State<CreateFolderForm> {
         await FirebaseFirestore.instance.collection('folder').add({
           'name': folderName,
           'category': category,
-          'createdAt':
-              FieldValue.serverTimestamp(), // Timestamp pour trier les dossiers
+          'createdAt': FieldValue.serverTimestamp(),
+          'createdBy': user!.uid, // Ajoute l'ID de l'utilisateur créateur
         });
+
         setState(() {
           isLoading = true;
         });

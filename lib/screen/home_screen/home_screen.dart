@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
+import 'package:share_file_iai/screen/AccountSettings/accout_setting_page.dart';
 import 'package:share_file_iai/screen/liste_document/list_doc.dart';
 import 'package:share_file_iai/widget/root_app_json.dart';
 import 'package:svg_flutter/svg.dart';
@@ -35,12 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
-        Center(
-          child: Text(
-            "Account Page",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-        )
+        AccountSettingsPage()
       ],
     );
   }

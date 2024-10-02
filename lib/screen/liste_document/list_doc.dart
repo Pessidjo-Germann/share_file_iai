@@ -121,7 +121,7 @@ class FolderListPage extends StatelessWidget {
                   final user = users[index];
                   final userId = user.id;
                   final userName = user['name'];
-                  if (index > users.length) {
+                  if (users.isNotEmpty && index > users.length) {
                     return BottonContinuer2(
                         size: MediaQuery.of(context).size,
                         color: Colors.red,

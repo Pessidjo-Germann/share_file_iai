@@ -25,6 +25,26 @@ class _BodyState extends State<Body> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Row(
+                children: [
+                  textPresentation(
+                      msg: 'Hello Germann',
+                      fontWeight: FontWeight.w300,
+                      size: 24),
+                  Spacer(),
+                  IconButton(
+                    icon: Icon(Icons.notifications), // Icône de notification
+                    onPressed: () {
+                      // Action à réaliser lorsque l'utilisateur clique sur l'icône
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Aucune notification')),
+                      );
+                      // Ou naviguer vers une page de notifications
+                      // Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationsPage()));
+                    },
+                  ),
+                ],
+              ),
               const SizedBox(height: 80),
               textPresentation(
                   maxLine: 2,

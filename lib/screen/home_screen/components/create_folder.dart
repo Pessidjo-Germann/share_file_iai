@@ -16,7 +16,7 @@ class _CreateFolderFormState extends State<CreateFolderForm> {
   final List<String> _categories = [
     'Scolarite',
     'Service études',
-    'Comptabilité',
+    'Comptabilite',
     'Autre'
   ]; // Liste des catégories
 

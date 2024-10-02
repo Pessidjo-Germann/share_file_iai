@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:share_file_iai/screen/AccountSettings/accout_setting_page.dart';
-import 'package:share_file_iai/screen/liste_document/list_doc.dart';
+import 'package:share_file_iai/screen/category_folders/category_folders_page.dart';
+import 'package:share_file_iai/screen/share_page/share_page.dart';
 import 'package:share_file_iai/widget/root_app_json.dart';
 import 'package:svg_flutter/svg.dart';
 import 'components/body.dart';
@@ -18,24 +20,23 @@ class _HomeScreenState extends State<HomeScreen> {
   int pageIndex = 0;
   @override
   Widget build(BuildContext context) {
+    User? user = FirebaseAuth.instance.currentUser;
     return Scaffold(
-      body: getBody(),
+      body: getBody(user!.uid, "HU"),
       bottomNavigationBar: getTabs(),
     );
   }
 
-  Widget getBody() {
+  Widget getBody(String userId, String name) {
     return IndexedStack(
       index: pageIndex,
       children: [
-        Body(),
-        FolderListPage(),
-        Center(
-          child: Text(
-            "Trash Page",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
+        Body(
+          name: name,
         ),
+        CategoryFoldersPage(),
+        // FolderListPage(),
+        SharedFoldersPage(currentUserId: userId),
         AccountSettingsPage()
       ],
     );

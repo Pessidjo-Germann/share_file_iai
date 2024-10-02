@@ -12,6 +12,7 @@ class BottonContinuer2 extends StatelessWidget {
   final Size size;
   final Function() press;
   final Color? color;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

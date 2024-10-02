@@ -7,7 +7,8 @@ import 'box_document.dart';
 import 'container_widget.dart';
 
 class Body extends StatefulWidget {
-  const Body({super.key});
+  final String name;
+  const Body({super.key, required this.name});
 
   @override
   State<Body> createState() => _BodyState();
@@ -27,8 +28,10 @@ class _BodyState extends State<Body> {
             children: [
               Row(
                 children: [
+                  const SizedBox(height: 20),
                   textPresentation(
-                      msg: 'Hello Germann',
+                      msg: 'Hello widget.name}',
+                      color: Colors.black,
                       fontWeight: FontWeight.w300,
                       size: 24),
                   Spacer(),
@@ -45,12 +48,12 @@ class _BodyState extends State<Body> {
                   ),
                 ],
               ),
-              const SizedBox(height: 80),
+              const SizedBox(height: 20),
               textPresentation(
                   maxLine: 2,
                   textAlign: TextAlign.start,
                   msg: 'Bienvenue dans votre \nEspace de travail.',
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w100,
                   color: Colors.black,
                   size: 25),
               const SizedBox(height: 10),

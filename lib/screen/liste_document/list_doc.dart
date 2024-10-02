@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:share_file_iai/constante.dart';
@@ -5,10 +6,12 @@ import 'package:share_file_iai/screen/liste_fichier/list_file.dart';
 import 'package:share_file_iai/widget/bouton_continuer_2.dart';
 
 class FolderListPage extends StatelessWidget {
-  const FolderListPage({super.key});
+  final String category;
+  const FolderListPage({super.key, required this.category});
 
   @override
   Widget build(BuildContext context) {
+    User? user = FirebaseAuth.instance.currentUser;
     String initalValue = '';
     final TextEditingController _folderNameController = TextEditingController();
     List<String> selectedUsers = [];
@@ -16,12 +19,12 @@ class FolderListPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Mes Dossiers'),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
+      body: FutureBuilder<QuerySnapshot>(
+        future: FirebaseFirestore.instance
             .collection('folder')
-            .orderBy('createdAt',
-                descending: true) // Trier par date de création
-            .snapshots(),
+            .where('category', isEqualTo: category)
+            .where('createdBy', isEqualTo: user!.uid)
+            .get(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text('Erreur: ${snapshot.error}'));
@@ -32,6 +35,7 @@ class FolderListPage extends StatelessWidget {
           }
 
           final folders = snapshot.data!.docs;
+          // Créer un Map pour regrouper les dossiers par catégorie
 
           return ListView.builder(
             itemCount: folders.length,
@@ -54,7 +58,7 @@ class FolderListPage extends StatelessWidget {
                       _showDeleteFolder(
                           context, folders[index].id, folder['name']);
                     } else if (value == 'share') {
-                      _showUser(context, selectedUsers);
+                      _showUser(context, selectedUsers, folders[index].id);
                     }
                   },
                   itemBuilder: (BuildContext context) {
@@ -98,7 +102,8 @@ class FolderListPage extends StatelessWidget {
     );
   }
 
-  void _showUser(BuildContext context, List<String> selectedUsers) {
+  void _showUser(
+      BuildContext context, List<String> selectedUsers, String folderId) {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
@@ -116,24 +121,34 @@ class FolderListPage extends StatelessWidget {
               final users = snapshot.data!.docs;
 
               return ListView.builder(
-                itemCount: (users.length + 1),
+                itemCount: users.length +
+                    1, // Inclus l'élément supplémentaire pour le bouton
                 itemBuilder: (context, index) {
-                  final user = users[index];
-                  final userId = user.id;
-                  final userName = user['name'];
-                  if (users.isNotEmpty && index > users.length) {
-                    return BottonContinuer2(
+                  // Vérifier si on est sur le dernier élément (bouton)
+                  if (index == users.length) {
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20),
+                      child: BottonContinuer2(
                         size: MediaQuery.of(context).size,
                         color: Colors.red,
                         press: () {
+                          shareFolder(folderId, context, selectedUsers);
                           Navigator.pop(context);
                         },
-                        name: 'Partager');
-                  }
-                  return CardUser(
+                        name: 'Partager',
+                      ),
+                    );
+                  } else {
+                    // Accéder aux données utilisateur uniquement si on n'est pas sur le bouton
+                    final user = users[index];
+                    final userId = user.id;
+                    final userName = user['name'];
+                    return CardUser(
                       userName: userName,
                       userId: userId,
-                      selectedUsers: selectedUsers);
+                      selectedUsers: selectedUsers,
+                    );
+                  }
                 },
               );
             },
@@ -320,6 +335,38 @@ void _updateFolderName(
     // Affiche un message d'erreur
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Erreur lors de la mise à jour: $e')),
+    );
+  }
+}
+
+void shareFolder(
+    String folderId, BuildContext context, List<String> userIds) async {
+  try {
+    // Récupérer le dossier existant
+    DocumentSnapshot folderSnapshot = await FirebaseFirestore.instance
+        .collection('folder')
+        .doc(folderId)
+        .get();
+
+    if (folderSnapshot.exists) {
+      // Mettre à jour le dossier avec la liste des utilisateurs autorisés
+      await FirebaseFirestore.instance
+          .collection('folder')
+          .doc(folderId)
+          .update({
+        'sharedWith': FieldValue.arrayUnion(userIds),
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Dossier partagé avec succès!')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Le dossier n\'existe pas.')),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Erreur lors du partage du dossier: $e')),
     );
   }
 }

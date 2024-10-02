@@ -30,9 +30,9 @@ class _BodyState extends State<Body> {
                 children: [
                   const SizedBox(height: 20),
                   textPresentation(
-                      msg: 'Hello widget.name}',
+                      msg: 'Hello ',
                       color: Colors.black,
-                      fontWeight: FontWeight.w300,
+                      fontWeight: FontWeight.w500,
                       size: 24),
                   Spacer(),
                   IconButton(
@@ -53,7 +53,7 @@ class _BodyState extends State<Body> {
                   maxLine: 2,
                   textAlign: TextAlign.start,
                   msg: 'Bienvenue dans votre \nEspace de travail.',
-                  fontWeight: FontWeight.w100,
+                  fontWeight: FontWeight.w200,
                   color: Colors.black,
                   size: 25),
               const SizedBox(height: 10),
